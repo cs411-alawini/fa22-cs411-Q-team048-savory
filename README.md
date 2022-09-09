@@ -1,1 +1,3 @@
-# fa22-cs411-Q-team048-savory
+# Q-team048-savory
+
+This file will later contain setup information for the web application.

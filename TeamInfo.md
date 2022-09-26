@@ -19,10 +19,10 @@
 
 |   Info      |        Description     |
 | ----------- | ---------------------- |
-|  Title      |       ProjectTitle     |
+|  Title      |       Query Analyzer     |
 | System URL  |      link_to_system    |
 | Video Link  |      link_to_video     |
 
 ## Project Summary
+Query Analyzer is an interactive web application to practice SQL. The goal of this application is to aid students to learn SQL by understanding the step by step execution of a SQL query.  This tool visualizes the results of the intermediate steps during query execution. The application also provides a dashboard for the Instructors to see the various aspects of the students’ performance on a set of predefined SQL practise questions.
 
-This is a summary of the project!

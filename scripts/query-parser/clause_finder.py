@@ -5,6 +5,8 @@ EXECUTION_ORDER = {'SELECT': 5, 'FROM': 1, 'WHERE': 2, 'GROUP BY': 3, 'HAVING': 
 UNKNOWN_STR = "UNKNOWN"
 PARANTHESIS_KEYWORDS = ['SUM', 'HAVING', 'MAX', 'AVG']
 
+CORRECT_ORDER = ['FROM', 'WHERE', 'GROUP BY', 'HAVING', 'SELECT', 'ORDER BY']
+
 
 def check_if_sub_query_paranthesis(parsed_stmnt):
     is_sqp = False
@@ -35,7 +37,6 @@ def get_queries(parsed_stmnt):
         sub_stmnt_tokens = [get_queries(token) for token in
                             (parsed_stmnt if not (is_parenthesis and is_sub_query_paran) else parsed_stmnt[1:-1])]
 
-
         name_idx = 0
         sub_stmnt = ''.join(str(token[name_idx]) for token in sub_stmnt_tokens)
         sub_queries = [query for token, queries in sub_stmnt_tokens for query in queries]
@@ -58,6 +59,7 @@ class ClauseFinder(object):
         # A dictionary with keyword and its corresponding clause statement
         #  in the query
         self.clauses = {}
+        self.ordered_clauses = []
 
     def _find_clauses(self):
         """
@@ -93,21 +95,24 @@ class ClauseFinder(object):
             # Remove the 'WHERE' clause from the 'FROM' Clause
             self.clauses['FROM'] = self.clauses['FROM'].replace(where_clause, '')
 
+    def set_order_of_clauses(self):
+        self.ordered_clauses = list(sorted(self.clauses.keys(), key=lambda s: CORRECT_ORDER.index(s)))
+
+
     def find_all_clauses(self):
         self._find_clauses()
         self._find_where_clause()
 
-    @staticmethod
-    def generate_clause_data(clause_data, temp_sub_id):
+    def generate_clause_data(self, sub_id):
         all_clause_list = []
-        for clause in clause_data:
+        for clause in self.clauses:
             clause_dict = {}
-            clause_dict["executionOrder"] = EXECUTION_ORDER.get(clause)
-            clause_dict["submissionId"] = temp_sub_id
+            clause_dict["executionOrder"] = self.ordered_clauses.index(clause) + 1
+            clause_dict["submissionId"] = sub_id
             clause_dict["type"] = clause
             clause_dict["relativeExecutionTime"] = 0.5
             clause_dict["Depth"] = 1
-            clause_dict["statement"] = clause_data[clause]
+            clause_dict["statement"] = self.clauses[clause]
             all_clause_list.append(clause_dict)
         return all_clause_list
 
@@ -120,7 +125,7 @@ if __name__ == '__main__':
     headers = ["executionOrder", "submissionId", "type", "relativeExecutionTime", "Depth", "statement"]
     dump_to_csv(data=[], headers=headers, csv_file='clauses.csv', mode='w')
 
-    for idx, submitted_query in enumerate(submissions):
+    for idx, submitted_query in submissions:
         try:
             sub_query_idx = -1
             stmnt, queries = get_queries(sqlparse.parse(submitted_query)[0])
@@ -128,8 +133,9 @@ if __name__ == '__main__':
                 # Find all the clauses for a query
                 cf = ClauseFinder(query)
                 cf.find_all_clauses()
+                cf.set_order_of_clauses()
 
-                clause_list = ClauseFinder.generate_clause_data(cf.clauses, idx+1)
+                clause_list = cf.generate_clause_data(idx)
                 dump_to_csv(data=clause_list, csv_file='clauses.csv', mode='a', headers=headers)
                 print(f"Successfully parsed the query with id: {idx}")
         except Exception as e:

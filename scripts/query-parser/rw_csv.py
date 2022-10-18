@@ -3,16 +3,21 @@ import csv
 
 def get_submitted_queries_from_csv(csv_file_path):
     submitted_queries = []
+    submitted_query_col = 2
     with open(csv_file_path, newline='') as csvfile:
         submission_info = csv.reader(csvfile, delimiter=',')
         for row in submission_info:
-            submitted_queries.append(row[2])
+            submitted_queries.append(row[submitted_query_col])
     # Remove the header info
     return submitted_queries[1:]
 
 
-def dump_to_csv(headers, data, csv_file):
-    with open(csv_file, 'w') as csvfile:
+def dump_to_csv(data, csv_file, headers=None, mode='w'):
+    if headers is None:
+        headers = []
+
+    with open(csv_file, mode) as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
-        writer.writeheader()
+        if mode == 'w':
+            writer.writeheader()
         writer.writerows(data)

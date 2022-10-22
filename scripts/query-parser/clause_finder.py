@@ -8,6 +8,7 @@ PARANTHESIS_KEYWORDS = ['SUM', 'HAVING', 'MAX', 'AVG']
 CORRECT_ORDER = ['FROM', 'WHERE', 'GROUP BY', 'HAVING', 'SELECT', 'ORDER BY']
 
 
+
 def check_if_sub_query_paranthesis(parsed_stmnt):
     is_sqp = False
     if parsed_stmnt.parent is not None:
@@ -95,8 +96,9 @@ class ClauseFinder(object):
             # Remove the 'WHERE' clause from the 'FROM' Clause
             self.clauses['FROM'] = self.clauses['FROM'].replace(where_clause, '')
 
-    def set_order_of_clauses(self):
+    def set_order_of_clauses(self, cnt):
         self.ordered_clauses = list(sorted(self.clauses.keys(), key=lambda s: CORRECT_ORDER.index(s)))
+        self.offset = cnt
 
 
     def find_all_clauses(self):
@@ -107,7 +109,7 @@ class ClauseFinder(object):
         all_clause_list = []
         for clause in self.clauses:
             clause_dict = {}
-            clause_dict["executionOrder"] = self.ordered_clauses.index(clause) + 1
+            clause_dict["executionOrder"] = self.ordered_clauses.index(clause) + 1 + self.offset
             clause_dict["submissionId"] = sub_id
             clause_dict["type"] = clause
             clause_dict["relativeExecutionTime"] = 0.5
@@ -124,16 +126,23 @@ if __name__ == '__main__':
 
     headers = ["executionOrder", "submissionId", "type", "relativeExecutionTime", "Depth", "statement"]
     dump_to_csv(data=[], headers=headers, csv_file='clauses.csv', mode='w')
+    # subquery1 = """SELECT name, email
+    #      FROM (SELECT * FROM user WHERE email IS NOT NULL)
+    #      WHERE id IN (SELECT cID FROM customer WHERE points > 5)
+    # """
+    # submissions = [(1, subquery1)]
 
     for idx, submitted_query in submissions:
         try:
             sub_query_idx = -1
+            cnt = 0
             stmnt, queries = get_queries(sqlparse.parse(submitted_query)[0])
             for query in queries:
                 # Find all the clauses for a query
                 cf = ClauseFinder(query)
                 cf.find_all_clauses()
-                cf.set_order_of_clauses()
+                cf.set_order_of_clauses(cnt)
+                cnt += len(cf.ordered_clauses)
 
                 clause_list = cf.generate_clause_data(idx)
                 dump_to_csv(data=clause_list, csv_file='clauses.csv', mode='a', headers=headers)

@@ -3,13 +3,13 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const path = require('path');
 var connection = mysql.createConnection({
-    host: '34.72.102.254',
+    host: '34.71.210.233',
     user: 'root',
-    password: 'demo123',
-    database: 'db'
+    password: 'cs411',
+    database: 'QueryViz'
 });
 
-const PORT = 8080;
+const PORT = 3000;
 
 connection.connect;
 
@@ -35,18 +35,22 @@ app.get('/success', function(req, res) {
 app.post('/mark', function(req, res) {
   var netid = req.body.netid;
    
-  var sql = `INSERT INTO attendance (netid, present) VALUES ('${netid}',1)`;
+  var sql = `SELECT * FROM Submission LIMIT 5`;
   console.log(sql);
   connection.query(sql, function(err, result) {
     if (err) {
       res.send(err)
+      console.log(err);
       return;
+    }
+    else{
+      console.log(result);
     }
     res.redirect('/success');
   });
 });
 
-app.listen(80, function () {
+app.listen(PORT, function () {
     console.log('Node app is running on port 80');
 });
 

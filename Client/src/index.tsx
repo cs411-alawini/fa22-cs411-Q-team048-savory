@@ -4,14 +4,14 @@ import './index.css';
 import {Provider} from 'react-redux';
 import reportWebVitals from './reportWebVitals';
 import {store} from "./Store/store";
-import Counter from './Components/Counter/Counter';
+import Shell from './Components/Shell/Shell';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <Provider store={store}>
     <React.StrictMode>
-      <Counter />
+      <Shell />
     </React.StrictMode>
   </Provider>
 );

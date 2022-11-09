@@ -4,42 +4,22 @@ import { RootState } from '../../Store/store';
 
 interface Questions {
     questions: Question[];
+    filteredQuestions: number[];
 }
 
 export interface Question {
-    iD: number;
-    description: string;
-    difficulty: string;
-    avgAttempts: number;
-    avgClauses: number;
-    status: boolean;
+    ID: number;
+    Description: string;
+    Difficulty: string;
+    avg_attempts: number;
+    avg_clauses: number;
+    Status: boolean;
+    Solution: string;
 }
 
 const initialState: Questions = {
-    questions: [{
-        iD: 1,
-        description: "abcd",
-        difficulty: "easy",
-        avgAttempts: 0,
-        avgClauses: 0,
-        status: false
-    },
-    {
-        iD: 2,
-        description: "efgh",
-        difficulty: "easy",
-        avgAttempts: 0,
-        avgClauses: 0,
-        status: false
-    },
-    {
-        iD: 3,
-        description: "ijkl",
-        difficulty: "easy",
-        avgAttempts: 0,
-        avgClauses: 0,
-        status: false
-    }]
+    questions: [],
+    filteredQuestions: []
 }
 
 const questionSlice = createSlice({
@@ -53,12 +33,19 @@ const questionSlice = createSlice({
             state.questions=payload;
         },
         deleteQuestion: (state, {payload}: PayloadAction<number>) => {
-            state.questions = state.questions.filter(s => s.iD !== payload);
+        },
+        editQuestion: (state, {payload}: PayloadAction<{id: number, desc: string}>) => {
+        },
+        searchQuestion: (state, {payload}: PayloadAction<string>) => {
+        },
+        setFilteredQuestionList: (state, {payload}: PayloadAction<number[]>) => {
+            state.filteredQuestions = payload;
         }
+
     },
   })
 
-  export const {getQuestions, setQuestions, deleteQuestion} = questionSlice.actions
+  export const {getQuestions, setQuestions, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList} = questionSlice.actions
   
   export default questionSlice.reducer
 

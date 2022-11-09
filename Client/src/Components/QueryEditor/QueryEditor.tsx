@@ -17,8 +17,8 @@ export default function QueryEditor(props: { questionId: number }) {
       <div style={{display: "flex", minHeight: "60px", maxHeight: "max-content",overflowWrap: "anywhere" ,alignItems: "center", backgroundColor: "#D3D3D3"}}>
         <div style={{ fontSize: "24px", fontWeight: "500" }}>
           {
-            questionDetails.questions.find((s) => s.iD === props.questionId)
-              ?.description
+            questionDetails.questions.find((s) => s.ID === props.questionId)
+              ?.Description
           }
         </div>
       </div>

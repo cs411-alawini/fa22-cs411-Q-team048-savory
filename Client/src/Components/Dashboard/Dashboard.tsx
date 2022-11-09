@@ -1,5 +1,5 @@
 import {
-    DefaultButton,
+  DefaultButton,
   DetailsList,
   DetailsListLayoutMode,
   Dialog,
@@ -11,47 +11,76 @@ import {
   SelectionMode,
   TextField,
 } from "@fluentui/react";
-import { Icon } from '@fluentui/react/lib/Icon';
+import { Icon } from "@fluentui/react/lib/Icon";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IQuestion } from "../Question/Question";
-import { questionSelector } from "../Question/QuestionSlice";
-import { useId, useBoolean } from '@fluentui/react-hooks';
+import {
+  deleteQuestion,
+  editQuestion,
+  questionSelector,
+  searchQuestion,
+} from "../Question/QuestionSlice";
+import { useId, useBoolean } from "@fluentui/react-hooks";
 import React from "react";
 
-const dialogStyles = { main: [{
-    selectors: {
-        [""]: { // Apply at root 
-            minWidth: '750px'
-        }
-    }
-}] };
+const dialogStyles = {
+  main: [
+    {
+      selectors: {
+        [""]: {
+          // Apply at root
+          minWidth: "750px",
+        },
+      },
+    },
+  ],
+};
 
 export default function Dashboard() {
   const [questions, setQuestions] = useState<IQuestion[]>([]);
+  const [search, setSearch] = useState("");
+  const dispatch = useDispatch();
   const questionDetails = useSelector(questionSelector);
   const [hideDialog, { toggle: toggleHideDialog }] = useBoolean(true);
-  const [currentQuestion, setCurrentQuestion]=useState(0);
-  const [currentQuestionDescription, setCurrentQuestionDescription]=useState("");
-  const handleQuestionChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) =>
-  {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestionDescription, setCurrentQuestionDescription] =
+    useState("");
+  const handleSearchChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
     if(newValue)
     {
-        setCurrentQuestionDescription(newValue);
+        setSearch(newValue);
     }
   }
+  const handleSearch = () => {
+    dispatch(searchQuestion(search));
+  }
+  const handleQuestionChange = (
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ) => {
+    if (newValue) {
+      setCurrentQuestionDescription(newValue);
+    }
+  };
+  const handleDelete = (questionId: number) => {
+    dispatch(deleteQuestion(questionId));
+  };
   const handleEdit = (questionId: number) => {
     toggleHideDialog();
     setCurrentQuestion(questionId);
-    setCurrentQuestionDescription(questionDetails.questions.find(s => s.iD == questionId)?.description ?? "");
-  }
+    setCurrentQuestionDescription(
+      questionDetails.questions.find((s) => s.ID == questionId)?.Description ??
+        ""
+    );
+  };
   const dialogContentProps = {
     type: DialogType.normal,
-    title: 'Edit question',
-    closeButtonAriaLabel: 'Close'
+    title: "Edit question",
+    closeButtonAriaLabel: "Close",
   };
-  const labelId: string = useId('dialogLabel');
-  const subTextId: string = useId('subTextLabel');
+  const labelId: string = useId("dialogLabel");
+  const subTextId: string = useId("subTextLabel");
   const modalProps: IModalProps = {
     titleAriaId: labelId,
     subtitleAriaId: subTextId,
@@ -59,19 +88,20 @@ export default function Dashboard() {
     styles: dialogStyles,
   };
   useEffect(() => {
-    let questionList: IQuestion[] = [];
-    for (let i = 0; i < questionDetails.questions.length; i++) {
-      questionList.push({
-        id: questionDetails.questions[i].iD,
-        question: questionDetails.questions[i].description,
-        desription: questionDetails.questions[i].description,
-        status: questionDetails.questions[i].status,
-        avgAttempts: questionDetails.questions[i].avgAttempts,
-        avgClauses: questionDetails.questions[i].avgClauses,
-      });
+    if (questionDetails.questions.length > 0) {
+      let questionList: IQuestion[] = [];
+      for (let i = 0; i < questionDetails.questions.length; i++) {
+        questionList.push({
+          id: questionDetails.questions[i].ID,
+          desription: questionDetails.questions[i].Description,
+          status: questionDetails.questions[i].Status,
+          avgAttempts: questionDetails.questions[i].avg_attempts,
+          avgClauses: questionDetails.questions[i].avg_clauses,
+        });
+      }
+      setQuestions(questionList);
     }
-    setQuestions(questionList);
-  }, []);
+  }, [questionDetails.questions]);
   function _copyAndSort<T>(
     items: T[],
     columnKey: string,
@@ -84,6 +114,12 @@ export default function Dashboard() {
         (isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1
       );
   }
+  const handleSubmitEdit = () => {
+    toggleHideDialog();
+    dispatch(
+      editQuestion({ id: currentQuestion, desc: currentQuestionDescription })
+    );
+  };
   function _onColumnClick(ev: React.MouseEvent<HTMLElement>, column: IColumn) {
     const newColumns: IColumn[] = columns.slice();
     const currColumn: IColumn = newColumns.filter(
@@ -109,7 +145,7 @@ export default function Dashboard() {
   const cols: IColumn[] = [
     {
       key: "column1",
-      name: "No",
+      name: "#",
       fieldName: "no",
       minWidth: 40,
       maxWidth: 60,
@@ -121,7 +157,7 @@ export default function Dashboard() {
       sortDescendingAriaLabel: "Sorted Z to A",
       onColumnClick: () => console.log("clicked"),
       onRender: (item: IQuestion) => {
-        return <span>{item.question}</span>;
+        return <span>{item.id}</span>;
       },
       data: "string",
       isPadded: true,
@@ -154,7 +190,7 @@ export default function Dashboard() {
       onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
-        return <span>{item.avgAttempts}</span>;
+        return <span>{item.avgAttempts ?? "N/A"}</span>;
       },
       isPadded: true,
     },
@@ -170,7 +206,7 @@ export default function Dashboard() {
       onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
-        return <span>{item.avgClauses}</span>;
+        return <span>{item.avgClauses ?? "N/A"}</span>;
       },
       isPadded: true,
     },
@@ -186,9 +222,17 @@ export default function Dashboard() {
       onColumnClick: _onColumnClick,
       onRender: (item: IQuestion) => {
         return (
-          <div style={{display: "flex", gap: "10px"}}>
-            <Icon style={{cursor: "pointer"}} onClick={() => console.log("Delete")} iconName="Delete" />
-            <Icon style={{cursor: "pointer"}} onClick={() => handleEdit(item.id)} iconName="Edit" />
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Icon
+              style={{ cursor: "pointer" }}
+              onClick={() => handleDelete(item.id)}
+              iconName="Delete"
+            />
+            <Icon
+              style={{ cursor: "pointer" }}
+              onClick={() => handleEdit(item.id)}
+              iconName="Edit"
+            />
           </div>
         );
       },
@@ -201,6 +245,14 @@ export default function Dashboard() {
   };
   return (
     <div style={{ width: "100%" }}>
+      <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+      <TextField styles={{
+        root: {
+            width: "100%"
+        }
+      }} value={search} placeholder="Search" onChange={handleSearchChange} />
+      <Icon onClick={handleSearch} style={{cursor: "pointer", marginTop: "6px"}} iconName="Search" />
+      </div>
       <DetailsList
         items={questions}
         columns={columns}
@@ -215,19 +267,25 @@ export default function Dashboard() {
           },
         }}
       />
-      {!hideDialog && 
-      <Dialog
-        hidden={hideDialog}
-        onDismiss={toggleHideDialog}
-        dialogContentProps={dialogContentProps}
-        modalProps={modalProps}
-      >
-        <TextField multiline rows={15} value={currentQuestionDescription} onChange={handleQuestionChange}/>
-        <DialogFooter>
-          <PrimaryButton onClick={toggleHideDialog} text="Submit" />
-          <DefaultButton onClick={toggleHideDialog} text="Cancel" />
-        </DialogFooter>
-      </Dialog>}
+      {!hideDialog && (
+        <Dialog
+          hidden={hideDialog}
+          onDismiss={toggleHideDialog}
+          dialogContentProps={dialogContentProps}
+          modalProps={modalProps}
+        >
+          <TextField
+            multiline
+            rows={10}
+            value={currentQuestionDescription}
+            onChange={handleQuestionChange}
+          />
+          <DialogFooter>
+            <PrimaryButton onClick={handleSubmitEdit} text="Submit" />
+            <DefaultButton onClick={toggleHideDialog} text="Cancel" />
+          </DialogFooter>
+        </Dialog>
+      )}
     </div>
   );
 }

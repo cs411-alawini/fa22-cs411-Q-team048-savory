@@ -5,7 +5,7 @@ import getAdvancedQueryResult from '../AdvancedQueryController/advQueries.js';
 
 
 export const searchQuestion = async (req, res) => {
-  const searchKey = req.body["search_key"];
+  const searchKey = req.body["data"]["search_key"];
   try{
     const QnIds = await searchquestion(searchKey);
     res.statusCode = 200;
@@ -36,7 +36,8 @@ export const deleteQuestion = async (req, res) => {
 
 export const updateQuestion = async (req, res) => {
   const qid = req.params.qid;
-  const newDescription = req.body["new_description"]
+  const newDescription = req.body["data"]["new_description"]
+  console.log(newDescription);
   try{
     await updatequestion(qid,newDescription);
     getQuestions(req, res);
@@ -62,7 +63,7 @@ export const getQuestions = async (req, res) => {
       let new_qn = {...qns};
       new_qn["Status"] = checkQnStatus(successfulQns, qns["ID"]);
       var qx = questionMetaData[qns["ID"].toString()]
-      console.log(new_qn);
+      //console.log(new_qn);
       let brand_new_qn = {...questionMetaData[qns["ID"].toString()], ...new_qn}
       brand_new_qns_data.push(brand_new_qn);
     }
@@ -125,7 +126,7 @@ const updatequestion = async (id, new_description) => {
 const searchquestion = async (searchKey) => {
   const connection = await mysql.createConnection(sqlDBConfig);
   try {
-    console.log(searchQuestionQuery(searchKey))
+    //console.log(searchQuestionQuery(searchKey))
     const [rows, cols] = await connection.execute(searchQuestionQuery(searchKey));
     return rows;
   } catch(e) {

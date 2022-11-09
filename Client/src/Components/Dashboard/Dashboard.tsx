@@ -20,6 +20,8 @@ import {
   editQuestion,
   questionSelector,
   searchQuestion,
+  setIsFiltered,
+  setQuestions,
 } from "../Question/QuestionSlice";
 import { useId, useBoolean } from "@fluentui/react-hooks";
 import React from "react";
@@ -38,7 +40,7 @@ const dialogStyles = {
 };
 
 export default function Dashboard() {
-  const [questions, setQuestions] = useState<IQuestion[]>([]);
+  const [questions, setQuestionsLocal] = useState<IQuestion[]>([]);
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const questionDetails = useSelector(questionSelector);
@@ -46,15 +48,30 @@ export default function Dashboard() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [currentQuestionDescription, setCurrentQuestionDescription] =
     useState("");
-  const handleSearchChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
-    if(newValue)
+  const handleSearchChange = (
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ) => {
+    setSearch(newValue!);
+    if(newValue?.length===0)
     {
-        setSearch(newValue);
+      dispatch(searchQuestion("%"));
     }
-  }
+  };
+  useEffect(() => {
+    if (questionDetails.isFiltered) {
+      let tmp: number[] = [];
+      questionDetails.filteredQuestions.forEach((x) => tmp.push(x.ID));
+      let newQuestions = questionDetails.allQuestions.filter(
+        (s) => tmp.indexOf(s.ID) !== -1
+      );
+      dispatch(setQuestions(newQuestions));
+    }
+  }, [questionDetails.filteredQuestions, questionDetails.isFiltered]);
   const handleSearch = () => {
+    setIsFiltered(false);
     dispatch(searchQuestion(search));
-  }
+  };
   const handleQuestionChange = (
     event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
     newValue?: string | undefined
@@ -69,10 +86,14 @@ export default function Dashboard() {
   const handleEdit = (questionId: number) => {
     toggleHideDialog();
     setCurrentQuestion(questionId);
-    setCurrentQuestionDescription(
-      questionDetails.questions.find((s) => s.ID == questionId)?.Description ??
-        ""
-    );
+    if (currentQuestionDescription.length === 0) {
+      setCurrentQuestionDescription(
+        questionDetails.questions.find((s) => s.ID == questionId)
+          ?.Description ?? ""
+      );
+    } else {
+      setCurrentQuestionDescription(currentQuestionDescription);
+    }
   };
   const dialogContentProps = {
     type: DialogType.normal,
@@ -88,8 +109,7 @@ export default function Dashboard() {
     styles: dialogStyles,
   };
   useEffect(() => {
-    if (questionDetails.questions.length > 0) {
-      let questionList: IQuestion[] = [];
+    let questionList: IQuestion[] = [];
       for (let i = 0; i < questionDetails.questions.length; i++) {
         questionList.push({
           id: questionDetails.questions[i].ID,
@@ -99,8 +119,7 @@ export default function Dashboard() {
           avgClauses: questionDetails.questions[i].avg_clauses,
         });
       }
-      setQuestions(questionList);
-    }
+      setQuestionsLocal(questionList);
   }, [questionDetails.questions]);
   function _copyAndSort<T>(
     items: T[],
@@ -140,7 +159,7 @@ export default function Dashboard() {
       currColumn.isSortedDescending
     );
     setColumns(newColumns);
-    setQuestions(newItems);
+    setQuestionsLocal(newItems);
   }
   const cols: IColumn[] = [
     {
@@ -245,13 +264,28 @@ export default function Dashboard() {
   };
   return (
     <div style={{ width: "100%" }}>
-      <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-      <TextField styles={{
-        root: {
-            width: "100%"
-        }
-      }} value={search} placeholder="Search" onChange={handleSearchChange} />
-      <Icon onClick={handleSearch} style={{cursor: "pointer", marginTop: "6px"}} iconName="Search" />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <TextField
+          styles={{
+            root: {
+              width: "100%",
+            },
+          }}
+          value={search}
+          placeholder="Search"
+          onChange={handleSearchChange}
+        />
+        <Icon
+          onClick={handleSearch}
+          style={{ cursor: "pointer", marginTop: "6px" }}
+          iconName="Search"
+        />
       </div>
       <DetailsList
         items={questions}

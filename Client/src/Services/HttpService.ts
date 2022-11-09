@@ -23,7 +23,7 @@ export async function GET<T>(url: string) {
 
 export async function UPDATE<T>(url: string, desc: string) {
     try {
-        const apiResult = await axios.get<T>(url,
+        const apiResult = await axios.post<T>(url,
         {
             headers: {
               Accept: 'application/json',
@@ -42,13 +42,30 @@ export async function UPDATE<T>(url: string, desc: string) {
 }
 export async function SEARCH<T>(url: string, key: string) {
     try {
-        const apiResult = await axios.get<T>(url,
+        const apiResult = await axios.post<T>(url,
         {
             headers: {
               Accept: 'application/json',
             },
             data: {
                 search_key: key
+            }
+        },
+        );
+        return apiResult.data as T;
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
+export async function DELETE<T>(url: string) {
+    try {
+        const apiResult = await axios.post<T>(url,
+        {
+            headers: {
+              Accept: 'application/json',
             }
         },
         );

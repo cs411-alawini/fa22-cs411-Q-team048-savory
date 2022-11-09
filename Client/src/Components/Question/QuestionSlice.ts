@@ -1,10 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { stat } from 'fs';
 import { RootState } from '../../Store/store';
 
 
 interface Questions {
     questions: Question[];
-    filteredQuestions: number[];
+    filteredQuestions: {ID: number}[];
+    allQuestions: Question[];
+    isFiltered: boolean;
 }
 
 export interface Question {
@@ -19,7 +22,9 @@ export interface Question {
 
 const initialState: Questions = {
     questions: [],
-    filteredQuestions: []
+    filteredQuestions: [],
+    allQuestions: [],
+    isFiltered: false
 }
 
 const questionSlice = createSlice({
@@ -27,7 +32,12 @@ const questionSlice = createSlice({
     initialState,
     reducers: {
         getQuestions: () => {
-
+        },
+        setIsFiltered: (state, {payload}: PayloadAction<boolean>)=> {
+            state.isFiltered = payload;
+        },
+        setAllQuestions: (state, {payload}: PayloadAction<Question[]>) => {
+            state.allQuestions=payload;
         },
         setQuestions: (state, {payload}: PayloadAction<Question[]>) => {
             state.questions=payload;
@@ -38,14 +48,16 @@ const questionSlice = createSlice({
         },
         searchQuestion: (state, {payload}: PayloadAction<string>) => {
         },
-        setFilteredQuestionList: (state, {payload}: PayloadAction<number[]>) => {
+        setFilteredQuestionList: (state, {payload}: PayloadAction<{ID:number}[]>) => {
             state.filteredQuestions = payload;
-        }
-
+            state.isFiltered = true;
+        },
+        executeSubmission: (state, {payload}: PayloadAction<string>) => {
+        },
     },
   })
 
-  export const {getQuestions, setQuestions, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList} = questionSlice.actions
+  export const {getQuestions, setQuestions, setAllQuestions, setIsFiltered, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList} = questionSlice.actions
   
   export default questionSlice.reducer
 

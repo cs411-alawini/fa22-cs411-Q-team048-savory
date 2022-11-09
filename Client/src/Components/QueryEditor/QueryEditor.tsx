@@ -12,6 +12,9 @@ export default function QueryEditor(props: { questionId: number }) {
         setQuery(newValue);
     }
   }
+  const handleSubmit = () => {
+    
+  }
   return (
     <div style={{ width: "100%" }}>
       <div style={{display: "flex", minHeight: "60px", maxHeight: "max-content",overflowWrap: "anywhere" ,alignItems: "center", backgroundColor: "#D3D3D3"}}>
@@ -29,7 +32,7 @@ export default function QueryEditor(props: { questionId: number }) {
         }}} value={query} onChange={handleQueryChange} />
       </div>
       <div style={{minHeight: "160px", display: "flex", alignItems: "center", alignSelf: "flex-end"}}>
-        <PrimaryButton text="Submit" onClick={() => console.log("hello")} />
+        <PrimaryButton text="Submit" onClick={handleSubmit} />
       </div>
     </div>
   );

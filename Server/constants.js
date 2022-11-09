@@ -26,4 +26,6 @@ GROUP BY tmp1.QuestionID;`
 
 export const getQuestionsQuery = `SELECT * from Question`;
 export const getSuccessfulQuestionsQuery = (uname) => `SELECT QuestionID from Submission WHERE IsSuccess=1 and UserID='${uname}' GROUP BY UserID,QuestionID;`
-export const updateQn = (id, desc) => `UPDATE Question SET Description=${desc} WHERE ID=${id}`
+export const updateQuestionsQuery = (id, desc) => `UPDATE Question SET Description='${desc}' WHERE ID=${id}`
+export const deleteQuestionsQuery = (id) => `DELETE FROM Question WHERE ID=${id}`;
+export const searchQuestionQuery = (searchKey) => `SELECT ID FROM Question WHERE Description LIKE '%${searchKey}%'`

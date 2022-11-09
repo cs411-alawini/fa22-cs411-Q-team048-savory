@@ -5,6 +5,9 @@ import {Provider} from 'react-redux';
 import reportWebVitals from './reportWebVitals';
 import {store} from "./Store/store";
 import Shell from './Components/Shell/Shell';
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
+initializeIcons();
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

@@ -33,9 +33,11 @@ const navLinkGroups: INavLinkGroup[] = [
     ],
   },
 ];
-interface NaviagtionState {
+export interface NaviagtionState {
   navState: string;
   setNavState: Function;
+  navQuestionId?: number;
+  setNavQuestionId?: Function;
 }
 export default function Navigation(props: NaviagtionState) {
     const handleLinkClick = (ev?: React.MouseEvent<HTMLElement>, item?: INavLink) => {

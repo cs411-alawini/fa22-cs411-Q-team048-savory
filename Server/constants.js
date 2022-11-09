@@ -29,3 +29,7 @@ export const getSuccessfulQuestionsQuery = (uname) => `SELECT QuestionID from Su
 export const updateQuestionsQuery = (id, desc) => `UPDATE Question SET Description='${desc}' WHERE ID=${id}`
 export const deleteQuestionsQuery = (id) => `DELETE FROM Question WHERE ID=${id}`;
 export const searchQuestionQuery = (searchKey) => `SELECT ID FROM Question WHERE Description LIKE '%${searchKey}%'`
+export const getMaxSubmissionId = () => `SELECT MAX(ID) AS MID FROM Submission` 
+export const insertSubmissionQuery = (id, query, qid, uid, ts) => `INSERT INTO Submission(ID, Timestamp, TotalExecutionTime, IsSuccess, SubmittedQuery, QuestionID, UserID) 
+VALUES(${id},'${ts}',0.72,False,'${query}',${qid},'${uid}')`
+export const getuserauthQuery = (id) => `SELECT Password from User WHERE ID='${id}'`

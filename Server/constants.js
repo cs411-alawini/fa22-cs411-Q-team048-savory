@@ -23,3 +23,7 @@ GROUP BY s.QuestionID,
 s.UserID) AS tmp1
 GROUP BY tmp1.QuestionID;`
 };
+
+export const getQuestionsQuery = `SELECT * from Question`;
+export const getSuccessfulQuestionsQuery = (uname) => `SELECT QuestionID from Submission WHERE IsSuccess=1 and UserID='${uname}' GROUP BY UserID,QuestionID;`
+export const updateQn = (id, desc) => `UPDATE Question SET Description=${desc} WHERE ID=${id}`

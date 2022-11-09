@@ -1,6 +1,6 @@
 import { put, takeEvery } from "redux-saga/effects";
-import { deleteQuestion, editQuestion, getQuestions, Question, searchQuestion, setAllQuestions, setFilteredQuestionList, setQuestions } from "../Components/Question/QuestionSlice";
-import {CatData, DELETE, GET, SEARCH, UPDATE} from "../Services/HttpService";
+import { deleteQuestion, editQuestion, executeSubmission, getQuestions, Question, searchQuestion, setAllQuestions, setFilteredQuestionList, setQuestions } from "../Components/Question/QuestionSlice";
+import {CatData, DELETE, GET, SEARCH, SUBMIT, UPDATE} from "../Services/HttpService";
 function* FetchAPIDataAsync() {
     try {
         const apiResult: Question[] = yield GET<Question[]>('http://localhost:8081/questions/getbyuser/kihow0');
@@ -48,6 +48,17 @@ function* SearchQuestionAsync(props: any) {
         console.log(e);
     }
 }
+
+function* ExecuteSubmissionAsync(props: any) {
+    try {
+        const apiResult: {ID: number}[] = yield SUBMIT<{ID: number}[]>('http://localhost:8081/submissions/insert', 'kihow0', props.payload.qid, props.payload.query);
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
 export function* watchGetQuestions() {
     yield takeEvery(getQuestions, FetchAPIDataAsync);
 }
@@ -62,4 +73,8 @@ export function* watchEditQuestion() {
 
 export function* watchSearchQuestion() {
     yield takeEvery(searchQuestion, SearchQuestionAsync);
+}
+
+export function* watchInsertSubmission() {
+    yield takeEvery(executeSubmission, ExecuteSubmissionAsync);
 }

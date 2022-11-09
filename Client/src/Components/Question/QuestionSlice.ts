@@ -52,12 +52,12 @@ const questionSlice = createSlice({
             state.filteredQuestions = payload;
             state.isFiltered = true;
         },
-        executeSubmission: (state, {payload}: PayloadAction<string>) => {
+        executeSubmission: (state, {payload}: PayloadAction<{qid: number, query: string}>) => {
         },
     },
   })
 
-  export const {getQuestions, setQuestions, setAllQuestions, setIsFiltered, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList} = questionSlice.actions
+  export const {getQuestions, setQuestions, setAllQuestions, setIsFiltered, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList, executeSubmission} = questionSlice.actions
   
   export default questionSlice.reducer
 

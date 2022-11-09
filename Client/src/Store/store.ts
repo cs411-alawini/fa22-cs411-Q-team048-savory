@@ -3,11 +3,13 @@ import createSagaMiddleware from 'redux-saga'
 import sagas from '../Sagas/rootSaga'
 import counterReducer from "../Components/Counter/CounterSlice";
 import questionReducer from "../Components/Question/QuestionSlice";
+import authReducer from "../Components/Auth/AuthSlice";
 const sagaMiddleware = createSagaMiddleware();
 
 const reducer = combineReducers({
     counter: counterReducer,
-    question: questionReducer
+    question: questionReducer,
+    auth: authReducer
 })
 
 export const store = configureStore({

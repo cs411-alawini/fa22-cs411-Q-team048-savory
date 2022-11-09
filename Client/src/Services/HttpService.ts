@@ -76,3 +76,49 @@ export async function DELETE<T>(url: string) {
         console.log(e);
     }
 }
+
+export async function SUBMIT<T>(url: string, uid: string, qid: number, query: string) {
+    try {
+        const apiResult = await axios.post<T>(url,
+        {
+            headers: {
+              Accept: 'application/json',
+            },
+            data: {
+                Query: query,
+                Qid: qid,
+                Uid: uid
+            }
+        },
+        );
+        return apiResult.data as T;
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
+export async function Login<T>(userName:string, password:string){
+    
+    const url = "http://localhost:8081/auth";
+    try{
+        const apiResult = await axios.post<T>(url,
+            {
+                headers: {
+                  Accept: 'application/json',
+                },
+                data: {
+                    userName: userName,
+                    password: password
+                }
+            },
+            );
+            return apiResult.data as T;
+    }
+    catch(e)
+    {
+        console.log(e);
+        return false;
+    }
+}

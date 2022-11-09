@@ -1,10 +1,11 @@
 import { PrimaryButton, TextField } from "@fluentui/react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { questionSelector } from "../Question/QuestionSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { executeSubmission, questionSelector } from "../Question/QuestionSlice";
 
 export default function QueryEditor(props: { questionId: number }) {
   const questionDetails = useSelector(questionSelector);
+  const dispatch = useDispatch();
   const [query, setQuery]=useState("");
   const handleQueryChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
     if(newValue)
@@ -13,7 +14,7 @@ export default function QueryEditor(props: { questionId: number }) {
     }
   }
   const handleSubmit = () => {
-    
+    dispatch(executeSubmission({qid: props.questionId, query: query}));
   }
   return (
     <div style={{ width: "100%" }}>

@@ -7,6 +7,7 @@ import { serverConfig } from './config.js';
 import advQueryRouter from './routes/AdvancedQueryRouter.js'
 import questionsRouter from './routes/Questions.js'
 import submissionsRouter from './routes/Submissions.js'
+import authRouter from './routes/Auth.js'
 
 var app = express();
 
@@ -23,6 +24,7 @@ app.use(express.static(__dirname + '../public'));
 app.use("/advqueries", advQueryRouter)
 app.use("/questions", questionsRouter)
 app.use("/submissions", submissionsRouter)
+app.use("/auth", authRouter)
 
 
 app.listen(serverConfig.PORT, () => {

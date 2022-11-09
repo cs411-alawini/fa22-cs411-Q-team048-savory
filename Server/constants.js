@@ -32,3 +32,4 @@ export const searchQuestionQuery = (searchKey) => `SELECT ID FROM Question WHERE
 export const getMaxSubmissionId = () => `SELECT MAX(ID) AS MID FROM Submission` 
 export const insertSubmissionQuery = (id, query, qid, uid, ts) => `INSERT INTO Submission(ID, Timestamp, TotalExecutionTime, IsSuccess, SubmittedQuery, QuestionID, UserID) 
 VALUES(${id},'${ts}',0.72,False,'${query}',${qid},'${uid}')`
+export const getuserauthQuery = (id) => `SELECT Password from User WHERE ID='${id}'`

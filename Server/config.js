@@ -1,6 +1,6 @@
 
 export const serverConfig = {
-    "PORT": 3000
+    "PORT": 8081
 };
 
 export const sqlDBConfig = {

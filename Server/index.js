@@ -5,6 +5,7 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import { serverConfig } from './config.js';
 import advQueryRouter from './routes/AdvancedQueryRouter.js'
+import questionsRouter from './routes/Questions.js'
 
 var app = express();
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '../public'));
 
 app.use("/advqueries", advQueryRouter)
+app.use("/questions", questionsRouter)
 
 
 app.listen(serverConfig.PORT, () => {

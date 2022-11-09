@@ -1,27 +1,37 @@
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 import { sqlDBConfig } from '../../config.js';
 import {advQueriesDic} from '../../constants.js';
 
 
 
-const getAdvancedQueryResult = (req, res) => {
+const getAdvancedQueryResult = async (queryTypes) => {
     
-    var connection = mysql.createConnection(sqlDBConfig);
-  
-    const queryType = req.params.type;
-    if(queryType in advQueriesDic){
-      connection.connect;
-      connection.query(advQueriesDic[queryType], (err, result) => {
-        if(err) 
-          res.send(err);
-        else
-          res.send(result);
-      });
-    }
-    else{
-      res.statusCode = 400;
-      res.send("Invalid Advanced Query Type");
-    }
-}
+    const questionMetaData = {};
+    for(const queryType of queryTypes)
+    {
+      if(queryType in advQueriesDic){
+        
+        const connection = await mysql.createConnection(sqlDBConfig);
+        try {
+          const [result,fields] = await connection.execute(advQueriesDic[queryType]);
+          result.forEach(questionObj => {
+            if (!(questionObj['QuestionID'] in questionMetaData))
+              questionMetaData[questionObj['QuestionID']] = {}
+            questionMetaData[questionObj['QuestionID']][queryType] = questionObj[queryType];
+          })
+        } catch(e) {
+          console.log(e);
+          return {};
+        }
+        
+      }
+       else{
+         console.log("Invalid Advanced Query Type");
+         return {};
+       }
+         
+    };
+    return questionMetaData;
+  }
 
 export default getAdvancedQueryResult;

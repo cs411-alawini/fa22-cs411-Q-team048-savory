@@ -1,5 +1,5 @@
 import express from 'express';
-import {getQuestions} from '../Controller/QuestionsController/Questions.js'
+import {getQuestions, deleteQuestion, updateQuestion, searchQuestion} from '../Controller/QuestionsController/Questions.js'
 
 const router = express.Router();
 
@@ -7,9 +7,23 @@ const router = express.Router();
   /advqueries/<avg_clauses/avg_attempts> are supported
   Returns: [{"QuestionId":<>,"avg_clauses":<>},{"QuestionId":<>,"avg_clauses":<>},...]
 */
-router.get('/:uname', (req, res) => {
-    console.log("Got user name", req.params.uname);
+router.get('/getbyuser/:uname', (req, res) => {
     getQuestions(req, res);
-  })
+  });
 
+router.get('/deletequestion/:qid', (req, res) => {
+    deleteQuestion(req, res);
+});
+
+router.get('/update/:qid', (req, res) => {
+    console.log("Hits update"+req.body["new_description"]);
+    updateQuestion(req,res);
+    
+});
+
+router.get('/search', (req, res) => {
+    console.log("Hits search"+req.body["search_key"]);
+    searchQuestion(req,res);
+    
+});
 export default router;

@@ -1,4 +1,7 @@
 import axios from 'axios'
+import { json } from 'stream/consumers';
+import { parseIsolatedEntityName } from 'typescript';
+import Auth from '../Components/Auth/Auth';
 
 export interface CatData {
     fact: string;
@@ -14,9 +17,34 @@ export async function GET<T>(url: string) {
         },
         );
         return apiResult.data as T;
+        
     }
     catch(e)
     {
         console.log(e);
+    }
+}
+
+export async function Login<T>(userName:string, password:string){
+    
+    const url = "http://localhost:8081/auth";
+    try{
+        const apiResult = await axios.post<T>(url,
+            {
+                headers: {
+                  Accept: 'application/json',
+                },
+                data: {
+                    userName: userName,
+                    password: password
+                }
+            },
+            );
+            return apiResult;
+    }
+    catch(e)
+    {
+        console.log(e);
+        return false;
     }
 }

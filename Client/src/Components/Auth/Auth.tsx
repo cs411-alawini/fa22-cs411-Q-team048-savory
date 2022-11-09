@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { authSelector, login } from "./AuthSlice";
 
 export default function Auth() {
-  const [isLoginSuccess, setIsLoginSuccess] = useState(true);//just for test here, should be false
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);//just for test here, should be false
   const [isAuthAttempted, setIsAuthAttempted] = useState(false);
   const authDetails = useSelector(authSelector);
   const [userName, setUserName] = useState("");
@@ -15,8 +15,7 @@ export default function Auth() {
 
 
   
-  const handleLogin = (userName: string, password: string) => {
-    
+  const handleLogin = () => {
     setIsAuthAttempted(true);
     dispatch(login({ userName: userName, password: password }));
   }
@@ -44,20 +43,33 @@ export default function Auth() {
       setError("Login failure");
     }
   }, [isLoginSuccess])
-
+  const handleuserNameChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
+    if(newValue)
+    {
+      setUserName(newValue);
+    }
+  }
+  const handlePasswordChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
+    if(newValue)
+    {
+      setPassword(newValue);
+    }
+  }
   return (
     <div className="auth">
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "600px", height: "350px" }}>
         <div>
           <TextField
             label="UserName"
+            onChange={handleuserNameChange}
           />
           <TextField
             label="Password"
-            type="password" />
+            type="password" 
+            onChange={handlePasswordChange}/>
 
 
-          <PrimaryButton text="Login" style={{ marginTop: "50px" }} onClick={() => handleLogin(userName, password)} />
+          <PrimaryButton text="Login" style={{ marginTop: "50px" }} onClick={handleLogin} />
         </div>
         {isAuthAttempted && !isLoginSuccess &&
           <div>

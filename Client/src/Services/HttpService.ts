@@ -40,7 +40,7 @@ export async function Login<T>(userName:string, password:string){
                 }
             },
             );
-            return apiResult;
+            return apiResult.data as T;
     }
     catch(e)
     {

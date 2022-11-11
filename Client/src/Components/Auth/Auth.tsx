@@ -1,11 +1,16 @@
-import { PrimaryButton, TextField } from "@fluentui/react";
+import {
+  MessageBar,
+  MessageBarType,
+  PrimaryButton,
+  TextField,
+} from "@fluentui/react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { authSelector, login } from "./AuthSlice";
+import { authSelector, login, setLoginResult } from "./AuthSlice";
 
 export default function Auth() {
-  const [isLoginSuccess, setIsLoginSuccess] = useState(false);//just for test here, should be false
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
   const [isAuthAttempted, setIsAuthAttempted] = useState(false);
   const authDetails = useSelector(authSelector);
   const [userName, setUserName] = useState("");
@@ -13,68 +18,97 @@ export default function Auth() {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
-
-  
   const handleLogin = () => {
     setIsAuthAttempted(true);
+    dispatch(setLoginResult(undefined));
     dispatch(login({ userName: userName, password: password }));
-  }
+  };
   useEffect(() => {
     if (authDetails.loginResult) {
       setIsLoginSuccess(authDetails.loginResult);
     }
-  }, [authDetails.loginResult])
-  const onUsernameChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-    if (newValue) {
-      setUserName(newValue);
-    }
-  }
-  const onPasswordChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-    if (newValue) {
-      setPassword(newValue);
-    }
-  }
+  }, [authDetails.loginResult]);
   const navigate = useNavigate();
   useEffect(() => {
     if (isLoginSuccess) {
       navigate("/home");
+    } else {
+      setError("Authentication failed");
     }
-    else {
-      setError("Login failure");
-    }
-  }, [isLoginSuccess])
-  const handleuserNameChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
-    if(newValue)
-    {
+  }, [isLoginSuccess]);
+  const handleuserNameChange = (
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ) => {
+    if (newValue) {
       setUserName(newValue);
     }
-  }
-  const handlePasswordChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string | undefined) => {
-    if(newValue)
-    {
+  };
+  const handlePasswordChange = (
+    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+    newValue?: string | undefined
+  ) => {
+    if (newValue) {
       setPassword(newValue);
     }
-  }
+  };
   return (
     <div className="auth">
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "600px", height: "350px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "450px",
+          height: "350px",
+          border: "2px solid darkgrey",
+        }}
+      >
         <div>
-          <TextField
-            label="UserName"
-            onChange={handleuserNameChange}
-          />
-          <TextField
-            label="Password"
-            type="password" 
-            onChange={handlePasswordChange}/>
-
-
-          <PrimaryButton text="Login" style={{ marginTop: "50px" }} onClick={handleLogin} />
-        </div>
-        {isAuthAttempted && !isLoginSuccess &&
+          {isAuthAttempted && authDetails.loginResult===false && (
+            <div style={{marginBottom: "20px"}}>
+              <MessageBar
+                messageBarType={MessageBarType.error}
+                isMultiline={false}
+                dismissButtonAriaLabel="Close"
+                onDismiss={() => setIsAuthAttempted(false)}
+              >
+                {error}
+              </MessageBar>
+            </div>
+          )}
           <div>
-            {error}
-          </div>}
+            <div
+              style={{ display: "flex", gap: "30px", flexDirection: "column" }}
+            >
+              <TextField
+                label="UserName"
+                onChange={handleuserNameChange}
+                styles={{
+                  root: {
+                    width: "300px",
+                  },
+                }}
+              />
+              <TextField
+                styles={{
+                  root: {
+                    width: "300px",
+                  },
+                }}
+                label="Password"
+                type="password"
+                onChange={handlePasswordChange}
+              />
+            </div>
+            <PrimaryButton
+              text="Login"
+              style={{ marginTop: "50px" }}
+              onClick={handleLogin}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

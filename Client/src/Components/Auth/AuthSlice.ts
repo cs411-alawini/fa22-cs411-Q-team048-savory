@@ -4,7 +4,7 @@ import { RootState } from '../../Store/store';
 interface Auth {
     userName: string;
     password: string;
-    loginResult: boolean;
+    loginResult: boolean | undefined;
 }
 
 const initialState: Auth = {
@@ -20,7 +20,7 @@ const authSlice = createSlice({
         login: (state, {payload}: PayloadAction<{userName: string, password: string}>) => {
             
         },
-        setLoginResult: (state, {payload}: PayloadAction<boolean>) => {
+        setLoginResult: (state, {payload}: PayloadAction<boolean | undefined>) => {
             state.loginResult=payload;
         }
     },

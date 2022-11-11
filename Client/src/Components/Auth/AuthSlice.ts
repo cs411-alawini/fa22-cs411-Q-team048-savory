@@ -18,10 +18,11 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state, {payload}: PayloadAction<{userName: string, password: string}>) => {
-            
+            state.userName=payload.userName;
+            state.password=payload.password;
         },
         setLoginResult: (state, {payload}: PayloadAction<boolean | undefined>) => {
-            state.loginResult=payload;
+            state.loginResult=payload; 
         }
     },
   })

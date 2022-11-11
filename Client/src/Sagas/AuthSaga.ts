@@ -6,7 +6,6 @@ function* FetchLoginResult(props: any) {
     try {
         console.log(props);
         const loginResult: boolean = yield Login<boolean>(props.payload.userName, props.payload.password);
-        console.log(JSON.stringify(loginResult)+"in saga");
         yield put(setLoginResult(loginResult));
     }
     catch(e)

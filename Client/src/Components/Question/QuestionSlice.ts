@@ -8,6 +8,7 @@ interface Questions {
     filteredQuestions: {ID: number}[];
     allQuestions: Question[];
     isFiltered: boolean;
+    isSubmitted: boolean;
 }
 
 export interface Question {
@@ -24,7 +25,8 @@ const initialState: Questions = {
     questions: [],
     filteredQuestions: [],
     allQuestions: [],
-    isFiltered: false
+    isFiltered: false,
+    isSubmitted: false
 }
 
 const questionSlice = createSlice({
@@ -52,12 +54,15 @@ const questionSlice = createSlice({
             state.filteredQuestions = payload;
             state.isFiltered = true;
         },
-        executeSubmission: (state, {payload}: PayloadAction<{qid: number, query: string}>) => {
+        executeSubmission: (state, {payload}: PayloadAction<{qid: number, query: string, uid: string}>) => {
         },
+        setSubmissionStatus: (state, {payload}: PayloadAction<boolean>) => {
+            state.isSubmitted=payload;
+        }
     },
   })
 
-  export const {getQuestions, setQuestions, setAllQuestions, setIsFiltered, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList, executeSubmission} = questionSlice.actions
+  export const {getQuestions, setSubmissionStatus ,setQuestions, setAllQuestions, setIsFiltered, deleteQuestion, editQuestion, searchQuestion, setFilteredQuestionList, executeSubmission} = questionSlice.actions
   
   export default questionSlice.reducer
 

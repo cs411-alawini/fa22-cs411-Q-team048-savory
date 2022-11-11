@@ -11,18 +11,18 @@ router.get('/getbyuser/:uname', (req, res) => {
     getQuestions(req, res);
   });
 
-router.get('/deletequestion/:qid', (req, res) => {
+router.post('/deletequestion/:qid', (req, res) => {
     deleteQuestion(req, res);
 });
 
-router.get('/update/:qid', (req, res) => {
-    console.log("Hits update"+req.body["new_description"]);
+router.post('/update/:qid', (req, res) => {
+    //console.log("Hits update"+req.body["new_description"]);
     updateQuestion(req,res);
     
 });
 
-router.get('/search', (req, res) => {
-    console.log("Hits search"+req.body["search_key"]);
+router.post('/search', (req, res) => {
+    //console.log("Hits search"+req.body["search_key"]);
     searchQuestion(req,res);
     
 });

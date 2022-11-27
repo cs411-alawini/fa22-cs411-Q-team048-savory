@@ -8,6 +8,7 @@ import advQueryRouter from './routes/AdvancedQueryRouter.js'
 import questionsRouter from './routes/Questions.js'
 import submissionsRouter from './routes/Submissions.js'
 import authRouter from './routes/Auth.js'
+import intermediateResultRouter from './routes/IntermediateResultRouter.js'
 
 var app = express();
 
@@ -31,6 +32,7 @@ app.use("/advqueries", advQueryRouter)
 app.use("/questions", questionsRouter)
 app.use("/submissions", submissionsRouter)
 app.use("/auth", authRouter)
+app.use("/intermediate", intermediateResultRouter)
 
 
 app.listen(serverConfig.PORT, () => {

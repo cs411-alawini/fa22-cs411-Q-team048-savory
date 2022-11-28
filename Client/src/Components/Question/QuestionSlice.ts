@@ -8,6 +8,8 @@ interface Questions {
   allQuestions: Question[];
   isFiltered: boolean;
   isSubmitted: boolean;
+  intermediateResults: IntermediateResults | undefined;
+  submissionID: number | undefined;
 }
 
 export interface IntermediateResults {
@@ -22,6 +24,7 @@ export interface IntermediateResults {
     }
   ];
   status: boolean;
+  error: string;
 }
 
 export interface Question {
@@ -40,6 +43,8 @@ const initialState: Questions = {
   allQuestions: [],
   isFiltered: false,
   isSubmitted: false,
+  intermediateResults: undefined,
+  submissionID: undefined
 };
 
 const questionSlice = createSlice({
@@ -72,15 +77,25 @@ const questionSlice = createSlice({
     executeSubmission: (
       state,
       { payload }: PayloadAction<{ qid: number; query: string; uid: string }>
-    ) => {},
+    ) => {
+      state.intermediateResults=undefined;
+    },
     setSubmissionStatus: (state, { payload }: PayloadAction<boolean>) => {
       state.isSubmitted = payload;
     },
-    getIntermediateResult: (state, { payload }: PayloadAction<string>) => {},
+    getIntermediateResult: (state, { payload }: PayloadAction<{query: string, submissionId: number | undefined, userId: string}>) => {},
+    setIntermediateResult: (state, {payload}: PayloadAction<IntermediateResults>) => {
+        state.intermediateResults = payload;
+    },
+    setSubmissionId: (state, {payload}: PayloadAction<number>) => {
+      state.submissionID = payload;
+    }
   },
 });
 
 export const {
+  setSubmissionId,
+  setIntermediateResult,
   getIntermediateResult,
   getQuestions,
   setSubmissionStatus,

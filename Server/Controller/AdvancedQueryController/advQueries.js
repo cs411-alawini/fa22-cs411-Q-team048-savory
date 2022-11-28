@@ -1,37 +1,19 @@
 import mysql from 'mysql2/promise';
 import { sqlDBConfig } from '../../config.js';
-import {advQueriesDic} from '../../constants.js';
-
-
-
+import { questionMetadataStoredProc } from '../../constants.js';
 const getAdvancedQueryResult = async (queryTypes) => {
     
-    const questionMetaData = {};
-    for(const queryType of queryTypes)
-    {
-      if(queryType in advQueriesDic){
-        
-        const connection = await mysql.createConnection(sqlDBConfig);
-        try {
-          const [result,fields] = await connection.execute(advQueriesDic[queryType]);
-          result.forEach(questionObj => {
-            if (!(questionObj['QuestionID'] in questionMetaData))
-              questionMetaData[questionObj['QuestionID']] = {}
-            questionMetaData[questionObj['QuestionID']][queryType] = questionObj[queryType];
-          })
-        } catch(e) {
-          console.log(e);
-          return {};
-        }
-        
-      }
-       else{
-         console.log("Invalid Advanced Query Type");
-         return {};
-       }
-         
-    };
-    return questionMetaData;
-  }
+  const qMetaData = {};
+  const connection = await mysql.createConnection(sqlDBConfig);
+  const [result, fields] = await connection.execute(questionMetadataStoredProc);
+  result[0].forEach(questionObj => {
+    qMetaData[questionObj["QuestionId"]] = {}
+    qMetaData[questionObj["QuestionId"]]["avg_clauses"] = questionObj["avg_clauses"]
+    qMetaData[questionObj["QuestionId"]]["avg_attempts"] = questionObj["avg_attempts"]
+  })
+  console.log(qMetaData);
+
+  return qMetaData;
+}
 
 export default getAdvancedQueryResult;

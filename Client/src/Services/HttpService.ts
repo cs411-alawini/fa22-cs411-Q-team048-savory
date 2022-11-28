@@ -99,7 +99,7 @@ export async function SUBMIT<T>(url: string, uid: string, qid: number, query: st
     }
 }
 
-export async function INTERMEDIATE<T>(url: string, query: string) {
+export async function INTERMEDIATE<T>(url: string, query: string, submissonID: number, userID: string) {
     try {
         const apiResult = await axios.post<T>(url,
         {
@@ -107,7 +107,9 @@ export async function INTERMEDIATE<T>(url: string, query: string) {
               Accept: 'application/json',
             },
             data: {
-                query: query
+                query: query,
+                submissonId: submissonID,
+                userId: userID
             }
         },
         );

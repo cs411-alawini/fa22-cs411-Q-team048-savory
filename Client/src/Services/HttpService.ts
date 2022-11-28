@@ -99,6 +99,26 @@ export async function SUBMIT<T>(url: string, uid: string, qid: number, query: st
     }
 }
 
+export async function INTERMEDIATE<T>(url: string, query: string) {
+    try {
+        const apiResult = await axios.post<T>(url,
+        {
+            headers: {
+              Accept: 'application/json',
+            },
+            data: {
+                query: query
+            }
+        },
+        );
+        return apiResult.data as T;
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
 export async function Login<T>(userName:string, password:string){
     
     const url = "http://localhost:8081/auth";

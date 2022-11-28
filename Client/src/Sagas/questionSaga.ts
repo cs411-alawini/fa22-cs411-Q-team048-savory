@@ -1,6 +1,6 @@
 import { put, takeEvery } from "redux-saga/effects";
-import { deleteQuestion, editQuestion, executeSubmission, getQuestions, Question, searchQuestion, setAllQuestions, setFilteredQuestionList, setQuestions, setSubmissionStatus } from "../Components/Question/QuestionSlice";
-import {CatData, DELETE, GET, SEARCH, SUBMIT, UPDATE} from "../Services/HttpService";
+import { deleteQuestion, editQuestion, executeSubmission, getIntermediateResult, getQuestions, IntermediateResults, Question, searchQuestion, setAllQuestions, setFilteredQuestionList, setQuestions, setSubmissionStatus } from "../Components/Question/QuestionSlice";
+import {CatData, DELETE, GET, INTERMEDIATE, SEARCH, SUBMIT, UPDATE} from "../Services/HttpService";
 function* FetchAPIDataAsync() {
     try {
         const apiResult: Question[] = yield GET<Question[]>('http://localhost:8081/questions/getbyuser/kihow0');
@@ -51,8 +51,21 @@ function* SearchQuestionAsync(props: any) {
 
 function* ExecuteSubmissionAsync(props: any) {
     try {
-        const apiResult: {ID: number}[] = yield SUBMIT<{ID: number}[]>('http://localhost:8081/submissions/insert', props.payload.uid, props.payload.qid, props.payload.query);
-        yield put(setSubmissionStatus(true));
+        const apiResult: {status: boolean} = yield SUBMIT<{status: boolean}>('http://localhost:8081/submissions/insert', props.payload.uid, props.payload.qid, props.payload.query);
+        yield put(setSubmissionStatus(apiResult.status));
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+}
+
+function* FetchIntermediateResultAsync(props: any) 
+{
+    try
+    {
+        const apiResult: IntermediateResults = yield INTERMEDIATE<IntermediateResults>('http://localhost:8081/intermediate/', props.payload.query);
+        console.log(apiResult);
     }
     catch(e)
     {
@@ -78,4 +91,8 @@ export function* watchSearchQuestion() {
 
 export function* watchInsertSubmission() {
     yield takeEvery(executeSubmission, ExecuteSubmissionAsync);
+}
+
+export function* watchGetIntermediateResult() {
+    yield takeEvery(getIntermediateResult, FetchIntermediateResultAsync);
 }

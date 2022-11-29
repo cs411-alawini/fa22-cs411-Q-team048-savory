@@ -17,9 +17,9 @@ export const insertSubmission = async (req, res) => {
       await connection.execute(insertSubmissionQuery(maxId+1,query, qid, uid, ts));
 
       res.statusCode = 200;
-      res.send("Inserted Submission");
+      res.send({status: true, submissionID: maxId + 1});
     } catch(e) {
         res.statusCode = 400;
-        res.send(e);
+        res.send({status: false, error: e});
     }
 };

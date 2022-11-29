@@ -1,7 +1,7 @@
 import {all} from 'redux-saga/effects'
 import { watchAttemptLogin } from './AuthSaga'
 import { watchCallAPI } from './counterSaga'
-import { watchDeleteQuestion, watchEditQuestion, watchGetQuestions, watchInsertSubmission, watchSearchQuestion } from './questionSaga'
+import { watchDeleteQuestion, watchEditQuestion, watchGetIntermediateResult, watchGetQuestions, watchInsertSubmission, watchSearchQuestion } from './questionSaga'
 
 export default function* rootSaga() {
     yield all([
@@ -11,6 +11,7 @@ export default function* rootSaga() {
       watchEditQuestion(),
       watchSearchQuestion(),
       watchInsertSubmission(),
-      watchAttemptLogin()
+      watchAttemptLogin(),
+      watchGetIntermediateResult()
     ])
   }

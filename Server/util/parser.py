@@ -87,6 +87,7 @@ class ClauseFinder(object):
         for (k,v) in self.iqs_dict.items():
             if ';' in v:
                 self.iqs_dict[k] = v[:v.find(';')+1]
+                #self.iqs_dict[k] = self.iqs_dict[k][:-1] + " LIMIT 10" + ";"
 
     def get_intermediate_queries(self):
         iqs = []

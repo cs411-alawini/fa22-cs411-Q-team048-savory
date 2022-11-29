@@ -1,27 +1,32 @@
 import mysql from 'mysql2/promise';
 import { sqlDBConfig } from '../../config.js';
 import {spawnSync} from 'child_process'
+import { maliciousQueryCheck } from '../../constants.js';
 
 export const getintermediateresults = async (req, res) => {
     
     const query = req.body["data"]["query"];
+    const submissionId = req.body["data"]["submissonId"];
     try{
-      const result = await runquerygetunpaginatedresponse(query);
-     // console.log("Result"+JSON.stringify(result))
+      const result = await runquerygetunpaginatedresponse(query, submissionId);
       res.statusCode = 200;
       res.send(result);
     }
     catch(e){
       console.log(e);
       res.statusCode = 400;
-      res.send({"status":false, "result": e});
+      res.send({"status":false, "error": e});
     }
     
   }
 
-const runquerygetunpaginatedresponse = async(query) => {
-    
-    var qStatus = await checkquerycorrectness(query);
+const runquerygetunpaginatedresponse = async(query, submissionId) => {
+    var isMalicious = await checkMaliciousQuery(submissionId);
+    var qStatus={'status': false};
+    if(!isMalicious)
+    qStatus = await checkquerycorrectness(query);
+    else
+    return {"status":false, "error":"Malicious query"};
     if(qStatus.status){
         console.log(qStatus.result);
         console.log("Run script");  
@@ -31,15 +36,14 @@ const runquerygetunpaginatedresponse = async(query) => {
         console.log(pythonProcess.error)
         if(pythonProcess.error){
           console.log(+pythonProcess.stdout)
-          return {"status":false, "result":"Script failed"};
+          return {"status":false, "error":"Script failed"};
         }
         if(pythonProcess.stderr){
           console.log(pythonProcess.stderr)
-          return {"status":false, "result":"Script failed"};
+          return {"status":false, "error":"Script failed"};
         }
         const res = await getintermediatedata(pythonProcess.stdout.toString())
         return res;   
-
     }
   return qStatus;  
 }
@@ -86,8 +90,23 @@ const checkquerycorrectness = async(query) => {
       //console.log("Actual query result"+ rows);
       return {"status":true, "result":rows};
     } catch(e) {
-      return {"status":false, "result": e.message};
+      return {"status":false, "error": e.message};
     }    
+}
+
+const checkMaliciousQuery = async(submissionId) => {
+  const connection = await mysql.createConnection(sqlDBConfig);
+  try {
+    console.log("Executing", maliciousQueryCheck)
+    const [rows, cols] = await connection.execute(maliciousQueryCheck(submissionId));
+    console.log(rows);
+    if(rows.length)
+    return true;
+  } catch(e) {
+    console.log(e);
+    return true;
+  }
+  return false;    
 }
 
 

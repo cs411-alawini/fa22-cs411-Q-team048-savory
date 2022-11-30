@@ -35,3 +35,6 @@ VALUES(${id},'${ts}',0.72,False,'${query}',${qid},'${uid}')`
 export const getuserauthQuery = (id) => `SELECT Password from User WHERE ID='${id}'`
 export const questionMetadataStoredProc = `CALL QuestionMetaData();`
 export const maliciousQueryCheck = (submissionId) => `SELECT * FROM malqueries where SubmissionID=${submissionId}`
+export const getSolutionQuery = (qid) => `SELECT Solution FROM Question where ID=${qid}`
+export const updateSubmission = (sid) => `Update Submission SET IsSuccess=1 WHERE ID=${sid}`
+export const insertclauses = (order, sid, type, extime, depth) => `INSERT INTO Clause VALUES(${order},${sid},"${type}",${extime}, ${depth})`

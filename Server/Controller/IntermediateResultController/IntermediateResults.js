@@ -1,14 +1,15 @@
 import mysql from 'mysql2/promise';
 import { sqlDBConfig } from '../../config.js';
 import {spawnSync} from 'child_process'
-import { maliciousQueryCheck } from '../../constants.js';
+import { maliciousQueryCheck, getSolutionQuery, updateSubmission, insertclauses } from '../../constants.js';
 
 export const getintermediateresults = async (req, res) => {
     
     const query = req.body["data"]["query"];
-    const submissionId = req.body["data"]["submissonId"];
+    const submissionId = req.body["data"]["submissionId"];
+    const qid = req.body["data"]["qid"];
     try{
-      const result = await runquerygetunpaginatedresponse(query, submissionId);
+      const result = await runquerygetunpaginatedresponse(query, submissionId, qid);
       res.statusCode = 200;
       res.send(result);
     }
@@ -20,9 +21,13 @@ export const getintermediateresults = async (req, res) => {
     
   }
 
-const runquerygetunpaginatedresponse = async(query, submissionId) => {
+const runquerygetunpaginatedresponse = async(query, submissionId, qid) => {
+
+  const isCorrect = await validatesolution(qid, query);
+    console.log(isCorrect);
     var isMalicious = await checkMaliciousQuery(submissionId);
     var qStatus={'status': false};
+
     if(!isMalicious)
     qStatus = await checkquerycorrectness(query);
     else
@@ -42,13 +47,30 @@ const runquerygetunpaginatedresponse = async(query, submissionId) => {
           console.log(pythonProcess.stderr)
           return {"status":false, "error":"Script failed"};
         }
-        const res = await getintermediatedata(pythonProcess.stdout.toString())
-        return res;   
+        const res = await getintermediatedata(pythonProcess.stdout.toString(), submissionId)
+        const isCorrect = await validatesolution(qid, query);
+        console.log(isCorrect);
+        if(isCorrect){
+          await updateSubmissionfn(submissionId)
+        }
+        return {...res, "isCorrect":isCorrect};   
     }
+  
   return qStatus;  
 }
 
-const getintermediatedata = async(script_output) => {
+const updateSubmissionfn = async (submissionId) => {
+  const connection = await mysql.createConnection(sqlDBConfig);
+  try{
+    console.log("updating submission", updateSubmission(submissionId));
+    connection.execute(updateSubmission(submissionId));
+  } catch(e){
+    console.log(e);
+  }
+
+}
+
+const getintermediatedata = async(script_output, sid) => {
   const connection = await mysql.createConnection(sqlDBConfig);
   var resArr = [];
   console.log(script_output+"replacing with double quotes for JSON parsing");
@@ -71,18 +93,29 @@ const getintermediatedata = async(script_output) => {
     intr_res["type"] = clause["type"]
     intr_res["order"] = clause["executionOrder"]
     intr_res["output"] = {}
-
     intr_res["output"]["rows"] = result;
     intr_res["output"]["cols"] = arr;
     console.log("intr res", intr_res);
     resArr.push(intr_res);
+    await insertclause(clause["executionOrder"], sid, intr_res["type"], clause["relativeExecutionTime"], clause["Depth"])
   }
 
   return {"result": resArr, "status":true};
 
 }    
 
-const checkquerycorrectness = async(query) => {
+const insertclause = async (order, sid, type, time, depth) => {
+  const connection = await mysql.createConnection(sqlDBConfig);
+  try {
+    console.log("Executing"+insertclauses(order,sid,type,time,depth))
+    const [rows, cols] = await connection.execute(insertclauses(order,sid,type,time,depth));
+    //console.log("Actual query result"+ rows);
+    return {"status":true, "result":rows};
+  } catch(e) {
+    return {"status":false, "error": e.message};
+  }   
+}
+const checkquerycorrectness = async (query) => {
     const connection = await mysql.createConnection(sqlDBConfig);
     try {
       console.log("Executing"+query)
@@ -93,13 +126,43 @@ const checkquerycorrectness = async(query) => {
       return {"status":false, "error": e.message};
     }    
 }
+const validatesolution = async(qid, query) => {
+  const connection = await mysql.createConnection(sqlDBConfig);
+  try {
+    console.log("Executing", getSolutionQuery(qid))
+    const [rows, cols] = await connection.execute(getSolutionQuery(qid));
+    const solution = rows[0]["Solution"]
+    const [actual,col] = await connection.execute(solution);
+    const [current,colss] = await connection.execute(query);
+    console.log("Res",actual, current);
+    return resultcomparision(actual, current);
+  } catch(e) {
+    console.log(e);
+  }
+  return false;    
+}
+
+const objectsEqual = (o1, o2) =>
+  Object.keys(o1).length === Object.keys(o2).length 
+      && Object.keys(o1).every(p => o1[p] === o2[p]);
+
+const resultcomparision = (arr1, arr2) => {
+  console.log("Comparator", JSON.stringify(arr1), JSON.stringify(arr2), arr1, arr2);
+  if(arr1.length != arr2.length)
+    return false;
+  for(var i=0; i<arr1.length; i++){
+    if(!objectsEqual(arr1[i], arr2[i])) return false;
+  }
+  return true;
+
+  
+}
 
 const checkMaliciousQuery = async(submissionId) => {
   const connection = await mysql.createConnection(sqlDBConfig);
   try {
     console.log("Executing", maliciousQueryCheck)
     const [rows, cols] = await connection.execute(maliciousQueryCheck(submissionId));
-    console.log(rows);
     if(rows.length)
     return true;
   } catch(e) {

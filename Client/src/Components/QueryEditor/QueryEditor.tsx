@@ -165,9 +165,9 @@ export default function QueryEditor(props: { questionId: number }) {
         </div>
       </div>
       <div
-        style={{ width: "65%", overflowY: "scroll", border: "2px solid black" }}
+        style={{ width: "65%", overflowY: "scroll" }}
       >
-        {questionDetails.intermediateResults?.status && (
+        {questionDetails.isSubmitted && questionDetails.intermediateResults?.status && (
           <div style={{ marginBottom: "10px", width: "100%" }}>
             <MessageBar
               messageBarType={MessageBarType.success}

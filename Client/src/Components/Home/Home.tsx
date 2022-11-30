@@ -13,17 +13,10 @@ export default function Home() {
     const authDetails = useSelector(authSelector);
     return (
         <div className="home">
-            {(authDetails.loginResult===undefined || authDetails.loginResult===false) && 
-            <div>
-                <Navigate to="/" replace/>
-            </div>}
-            {authDetails.loginResult===true && 
-            <div>
-                <Navigation navState={navState} setNavState={setNavState}/>
+            <Navigation navState={navState} setNavState={setNavState}/>
             {navState=='0' && <Dashboard />}
             {navState=='1' && <Question navState={navState} setNavState={setNavState} navQuestionId={navQuestionId} setNavQuestionId={setNavQuestionId}/>}
             {navState=='-1' && <QueryEditor questionId={navQuestionId}/>}
-            </div>}
         </div>
     );
 }

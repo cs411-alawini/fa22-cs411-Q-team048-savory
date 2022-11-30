@@ -10,6 +10,7 @@ import {
   Pivot,
   PivotItem,
   PrimaryButton,
+  rgb2hex,
   SelectionMode,
   TextField,
 } from "@fluentui/react";
@@ -97,11 +98,14 @@ export default function QueryEditor(props: { questionId: number }) {
     setQuery(newValue!);
   };
   useEffect(() => {
-    setMessage("Successfully inserted submission!");
+    if(questionDetails.intermediateResults?.isCorrect)
+    setMessage("Correct answer");
+    else
+    setMessage("Incorrect answer");
     if (questionDetails.isSubmitted) {
-      dispatch(getIntermediateResult({query: query, submissionId: questionDetails.submissionID, userId: authDetails.userName}));
+      dispatch(getIntermediateResult({query: query, submissionId: questionDetails.submissionID, questionID: props.questionId}));
     }
-  }, [questionDetails.isSubmitted]);
+  }, [questionDetails.isSubmitted, questionDetails.intermediateResults?.isCorrect]);
   const handleSubmit = () => {
     setPage(1);
     dispatch(setSubmissionStatus(false));
@@ -169,6 +173,17 @@ export default function QueryEditor(props: { questionId: number }) {
               messageBarType={MessageBarType.success}
               isMultiline={false}
               dismissButtonAriaLabel="Close"
+              styles={{
+                root: {
+                  backgroundColor: questionDetails.intermediateResults.isCorrect ? "#DFF6DD" : "#FED9CC"
+                },
+                icon: {
+                  display: "none" 
+                },
+                text: {
+                  marginLeft: "-20px"
+                }
+              }}
               onDismiss={() => dispatch(setSubmissionStatus(false))}
             >
               {message}
@@ -206,13 +221,13 @@ export default function QueryEditor(props: { questionId: number }) {
                       }}
                     >
                       <PrimaryButton
-                        text="Page up"
-                        onClick={() => setPage(page + 1)}
+                        text="Page down"
+                        onClick={() => setPage(page - 1)}
                       />
                       <div style={{ marginTop: "4px" }}>{page}/{questionDetails.intermediateResults?.result!==undefined && <>{Math.ceil(questionDetails.intermediateResults.result.find(s=> s.type===pivotText)?.output.rows.length!/10)}</>}</div>
                       <PrimaryButton
-                        text="Page down"
-                        onClick={() => setPage(page - 1)}
+                        text="Page up"
+                        onClick={() => setPage(page + 1)}
                       />
                     </div>
                   </div>

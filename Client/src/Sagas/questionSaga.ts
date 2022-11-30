@@ -1,9 +1,10 @@
 import { put, takeEvery } from "redux-saga/effects";
 import { deleteQuestion, editQuestion, executeSubmission, getIntermediateResult, getQuestions, IntermediateResults, Question, searchQuestion, setAllQuestions, setFilteredQuestionList, setIntermediateResult, setQuestions, setSubmissionId, setSubmissionStatus } from "../Components/Question/QuestionSlice";
 import {CatData, DELETE, GET, INTERMEDIATE, SEARCH, SUBMIT, UPDATE} from "../Services/HttpService";
-function* FetchAPIDataAsync() {
+function* FetchAPIDataAsync(props: any) {
     try {
-        const apiResult: Question[] = yield GET<Question[]>('http://localhost:8081/questions/getbyuser/kihow0');
+        console.log(props.payload);
+        const apiResult: Question[] = yield GET<Question[]>('http://localhost:8081/questions/getbyuser/'+props.payload);
         yield put(setQuestions(apiResult));
         yield put(setAllQuestions(apiResult));
     }
@@ -64,7 +65,7 @@ function* FetchIntermediateResultAsync(props: any)
 {
     try
     {
-        let apiResult: IntermediateResults = yield INTERMEDIATE<IntermediateResults>('http://localhost:8081/intermediate/', props.payload.query, props.payload.submissionId, props.payload.userId);
+        let apiResult: IntermediateResults = yield INTERMEDIATE<IntermediateResults>('http://localhost:8081/intermediate/', props.payload.query, props.payload.submissionId, props.payload.questionID);
         if(apiResult.status)
         {
             yield apiResult.result.sort((a,b)=> (a.order > b.order) ? 1 : -1);
@@ -83,7 +84,8 @@ function* FetchIntermediateResultAsync(props: any)
                 }
               ],
               status: false,
-              error: apiResult.error}));
+              error: apiResult.error,
+              isCorrect: false}));
         }
     }
     catch(e)

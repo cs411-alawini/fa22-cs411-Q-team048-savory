@@ -121,46 +121,14 @@ export default function Dashboard() {
       }
       setQuestionsLocal(questionList);
   }, [questionDetails.questions]);
-  function _copyAndSort<T>(
-    items: T[],
-    columnKey: string,
-    isSortedDescending?: boolean
-  ): T[] {
-    const key = columnKey as keyof T;
-    return items
-      .slice(0)
-      .sort((a: T, b: T) =>
-        (isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1
-      );
-  }
+  
   const handleSubmitEdit = () => {
     toggleHideDialog();
     dispatch(
       editQuestion({ id: currentQuestion, desc: currentQuestionDescription })
     );
   };
-  function _onColumnClick(ev: React.MouseEvent<HTMLElement>, column: IColumn) {
-    const newColumns: IColumn[] = columns.slice();
-    const currColumn: IColumn = newColumns.filter(
-      (currCol) => column.key === currCol.key
-    )[0];
-    newColumns.forEach((newCol: IColumn) => {
-      if (newCol === currColumn) {
-        currColumn.isSortedDescending = !currColumn.isSortedDescending;
-        currColumn.isSorted = true;
-      } else {
-        newCol.isSorted = false;
-        newCol.isSortedDescending = true;
-      }
-    });
-    const newItems = _copyAndSort(
-      questions,
-      currColumn.fieldName!,
-      currColumn.isSortedDescending
-    );
-    setColumns(newColumns);
-    setQuestionsLocal(newItems);
-  }
+  
   const cols: IColumn[] = [
     {
       key: "column1",
@@ -170,11 +138,6 @@ export default function Dashboard() {
       maxWidth: 60,
       isRowHeader: true,
       isResizable: true,
-      isSorted: true,
-      isSortedDescending: false,
-      sortAscendingAriaLabel: "Sorted A to Z",
-      sortDescendingAriaLabel: "Sorted Z to A",
-      onColumnClick: () => console.log("clicked"),
       onRender: (item: IQuestion) => {
         return <span>{item.id}</span>;
       },
@@ -185,12 +148,9 @@ export default function Dashboard() {
       key: "column2",
       name: "Description",
       fieldName: "description",
-      minWidth: 410,
-      maxWidth: 550,
+      minWidth: 600,
+      maxWidth: 750,
       isResizable: true,
-      isSorted: true,
-      isSortedDescending: false,
-      onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
         return <span>{item.desription}</span>;
@@ -203,10 +163,6 @@ export default function Dashboard() {
       fieldName: "Avg Attempts",
       minWidth: 70,
       maxWidth: 90,
-      isSorted: true,
-      isSortedDescending: false,
-      isResizable: true,
-      onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
         return <span>{item.avgAttempts ?? "N/A"}</span>;
@@ -219,10 +175,6 @@ export default function Dashboard() {
       fieldName: "Avg Clauses",
       minWidth: 70,
       maxWidth: 90,
-      isSorted: true,
-      isSortedDescending: false,
-      isResizable: true,
-      onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
         return <span>{item.avgClauses ?? "N/A"}</span>;
@@ -235,10 +187,6 @@ export default function Dashboard() {
       fieldName: "Edit/Delete",
       minWidth: 70,
       maxWidth: 90,
-      isSorted: true,
-      isSortedDescending: false,
-      isResizable: true,
-      onColumnClick: _onColumnClick,
       onRender: (item: IQuestion) => {
         return (
           <div style={{ display: "flex", gap: "10px" }}>

@@ -34,40 +34,7 @@ export default function Question(props: NaviagtionState) {
       setQuestions(questionList);
     }
   }, [questionDetails.questions]);
-  function _copyAndSort<T>(
-    items: T[],
-    columnKey: string,
-    isSortedDescending?: boolean
-  ): T[] {
-    const key = columnKey as keyof T;
-    return items
-      .slice(0)
-      .sort((a: T, b: T) =>
-        (isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1
-      );
-  }
-  function _onColumnClick(ev: React.MouseEvent<HTMLElement>, column: IColumn) {
-    const newColumns: IColumn[] = columns.slice();
-    const currColumn: IColumn = newColumns.filter(
-      (currCol) => column.key === currCol.key
-    )[0];
-    newColumns.forEach((newCol: IColumn) => {
-      if (newCol === currColumn) {
-        currColumn.isSortedDescending = !currColumn.isSortedDescending;
-        currColumn.isSorted = true;
-      } else {
-        newCol.isSorted = false;
-        newCol.isSortedDescending = true;
-      }
-    });
-    const newItems = _copyAndSort(
-      questions,
-      currColumn.fieldName!,
-      currColumn.isSortedDescending
-    );
-    setColumns(newColumns);
-    setQuestions(newItems);
-  }
+  
   const cols: IColumn[] = [
     {
       key: "column1",
@@ -77,11 +44,6 @@ export default function Question(props: NaviagtionState) {
       maxWidth: 60,
       isRowHeader: true,
       isResizable: true,
-      isSorted: true,
-      isSortedDescending: false,
-      sortAscendingAriaLabel: "Sorted A to Z",
-      sortDescendingAriaLabel: "Sorted Z to A",
-      onColumnClick: () => console.log("clicked"),
       onRender: (item: IQuestion) => {
         return (
           item.id
@@ -94,12 +56,9 @@ export default function Question(props: NaviagtionState) {
       key: "column2",
       name: "Description",
       fieldName: "description",
-      minWidth: 410,
-      maxWidth: 550,
+      minWidth: 850,
+      maxWidth: 1000,
       isResizable: true,
-      isSorted: true,
-      isSortedDescending: false,
-      onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
         return (
@@ -123,10 +82,6 @@ export default function Question(props: NaviagtionState) {
       fieldName: "status",
       minWidth: 70,
       maxWidth: 90,
-      isSorted: true,
-      isSortedDescending: false,
-      isResizable: true,
-      onColumnClick: _onColumnClick,
       data: "number",
       onRender: (item: IQuestion) => {
         return <span>{item.status ? "Success" : "Failure"}</span>;

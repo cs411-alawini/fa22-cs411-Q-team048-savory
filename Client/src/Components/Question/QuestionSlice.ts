@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { stat } from "fs";
 import { RootState } from "../../Store/store";
 
 interface Questions {
@@ -25,6 +24,7 @@ export interface IntermediateResults {
   ];
   status: boolean;
   error: string;
+  isCorrect: boolean;
 }
 
 export interface Question {
@@ -51,7 +51,7 @@ const questionSlice = createSlice({
   name: "question",
   initialState,
   reducers: {
-    getQuestions: () => {},
+    getQuestions: (state, {payload}:PayloadAction<string>) => {console.log(payload)},
     setIsFiltered: (state, { payload }: PayloadAction<boolean>) => {
       state.isFiltered = payload;
     },
@@ -83,7 +83,7 @@ const questionSlice = createSlice({
     setSubmissionStatus: (state, { payload }: PayloadAction<boolean>) => {
       state.isSubmitted = payload;
     },
-    getIntermediateResult: (state, { payload }: PayloadAction<{query: string, submissionId: number | undefined, userId: string}>) => {},
+    getIntermediateResult: (state, { payload }: PayloadAction<{query: string, submissionId: number | undefined, questionID: number}>) => {console.log(payload.questionID)},
     setIntermediateResult: (state, {payload}: PayloadAction<IntermediateResults>) => {
         state.intermediateResults = payload;
     },

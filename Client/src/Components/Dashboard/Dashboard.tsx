@@ -18,6 +18,7 @@ import { IQuestion } from "../Question/Question";
 import {
   deleteQuestion,
   editQuestion,
+  Question,
   questionSelector,
   searchQuestion,
   setIsFiltered,
@@ -86,15 +87,13 @@ export default function Dashboard() {
   const handleEdit = (questionId: number) => {
     toggleHideDialog();
     setCurrentQuestion(questionId);
-    if (currentQuestionDescription.length === 0) {
-      setCurrentQuestionDescription(
-        questionDetails.questions.find((s) => s.ID == questionId)
-          ?.Description ?? ""
-      );
-    } else {
-      setCurrentQuestionDescription(currentQuestionDescription);
-    }
   };
+  useEffect(() => {
+    setCurrentQuestionDescription(
+      questionDetails.questions.find((s) => s.ID == currentQuestion)
+        ?.Description ?? ""
+    );
+  }, [currentQuestion])
   const dialogContentProps = {
     type: DialogType.normal,
     title: "Edit question",

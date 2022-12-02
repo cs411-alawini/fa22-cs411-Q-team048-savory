@@ -24,3 +24,7 @@ code {
   display: flex;
   overflow: hidden;
 }
+
+p {
+  margin: 0;
+}

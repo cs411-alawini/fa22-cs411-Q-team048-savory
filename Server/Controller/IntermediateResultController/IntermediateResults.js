@@ -22,9 +22,6 @@ export const getintermediateresults = async (req, res) => {
   }
 
 const runquerygetunpaginatedresponse = async(query, submissionId, qid) => {
-
-  const isCorrect = await validatesolution(qid, query);
-    console.log(isCorrect);
     var isMalicious = await checkMaliciousQuery(submissionId);
     var qStatus={'status': false};
 

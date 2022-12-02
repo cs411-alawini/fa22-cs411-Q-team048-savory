@@ -123,6 +123,16 @@ export default function QueryEditor(props: { questionId: number }) {
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div style={{ width: "35%" }}>
+      <div style={{display: "flex", flexDirection: "column"}}>
+        <div style={{backgroundColor: "#D3D3D3", fontSize: "24px", height: "28px", fontWeight: "500"}}>
+        Schema
+        </div>
+        <div>
+        <p>Students(NetId, FirstName, LastName, Department); </p>
+        <p>Enrollments(NetId, CRN, Credits, Score);</p>
+        <p>Courses(CRN, Title, Department, Instructor);</p>
+      </div>
+      </div>
         <div
           style={{
             display: "flex",

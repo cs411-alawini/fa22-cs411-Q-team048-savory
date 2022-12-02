@@ -3,7 +3,6 @@ import { deleteQuestion, editQuestion, executeSubmission, getIntermediateResult,
 import {CatData, DELETE, GET, INTERMEDIATE, SEARCH, SUBMIT, UPDATE} from "../Services/HttpService";
 function* FetchAPIDataAsync(props: any) {
     try {
-        console.log(props.payload);
         const apiResult: Question[] = yield GET<Question[]>('http://localhost:8081/questions/getbyuser/'+props.payload);
         yield put(setQuestions(apiResult));
         yield put(setAllQuestions(apiResult));

@@ -51,7 +51,7 @@ const questionSlice = createSlice({
   name: "question",
   initialState,
   reducers: {
-    getQuestions: (state, {payload}:PayloadAction<string>) => {console.log(payload)},
+    getQuestions: (state, {payload}:PayloadAction<string>) => {},
     setIsFiltered: (state, { payload }: PayloadAction<boolean>) => {
       state.isFiltered = payload;
     },
